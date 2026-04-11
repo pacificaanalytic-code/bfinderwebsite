@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Successful – Nomad Beauty Workers</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f9fafb;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+    .card {
+      max-width: 440px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      padding: 48px 36px;
+      text-align: center;
+    }
+    .icon-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #ecfdf5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+    }
+    .checkmark {
+      width: 40px;
+      height: 40px;
+      stroke: #10b981;
+      stroke-width: 3;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+    .btn {
+      display: inline-block;
+      background: #1a1a2e;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+    }
+    .btn:hover { background: #2d2d44; }
+    .note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon-circle">
+      <svg class="checkmark" viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="20" stroke="#10b981" stroke-width="2.5" fill="none"/>
+        <polyline points="15,24 21,30 33,18"/>
+      </svg>
+    </div>
+
+    <h1>Payment Successful!</h1>
+    <p class="subtitle">
+      Your subscription is now active. You're all set to grow your beauty business
+      and connect with more clients on Nomad Beauty Workers.
+    </p>
+
+    <a class="btn" href="nomadbeautyworkers://subscription">Return to App</a>
+
+    <p class="note">
+      A confirmation email has been sent to you via Stripe.<br/>
+      If the button above doesn't open the app, simply close this page and return manually.
+    </p>
+  </div>
+</body>
+</html>
