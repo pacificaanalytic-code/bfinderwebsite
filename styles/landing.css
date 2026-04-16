@@ -398,6 +398,36 @@ section { padding: 100px 24px; }
 .features {
   background: linear-gradient(180deg, var(--darkest) 0%, var(--darker) 100%);
 }
+
+/* Accessibility utility: visually hidden but keyboard-focusable */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0;
+}
+.sr-only:focus, .sr-only:active {
+  position: static !important;
+  width: auto; height: auto;
+  margin: 0; overflow: visible; clip: auto;
+  white-space: normal;
+}
+
+/* Footer subtle link (visible but low-contrast) */
+.footer-link {
+  font-size: 13px;
+  color: rgba(255,255,255,0.72);
+  opacity: 0.85;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255,255,255,0.04);
+  text-decoration: none;
+}
+.footer-link:hover {
+  color: var(--gold);
+  opacity: 1;
+}
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

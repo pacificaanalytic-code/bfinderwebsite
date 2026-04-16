@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delete Account – BFinder</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #301934;
+      color: #F5E6D3;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .card {
+      background: #1a0f1e;
+      border: 1px solid #3d2545;
+      border-radius: 16px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #dec583;
+      letter-spacing: 1px;
+    }
+
+    .logo p {
+      font-size: 13px;
+      color: #9BA1A6;
+      margin-top: 4px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #F5E6D3;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #9BA1A6;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      background: #2a1a30;
+      border: 1px solid #3d2545;
+      border-radius: 10px;
+      color: #F5E6D3;
+      font-size: 15px;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus { border-color: #dec583; }
+    input::placeholder { color: #665070; }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary {
+      background: #dec583;
+      color: #301934;
+    }
+
+    .btn-danger {
+      background: #c0392b;
+      color: #fff;
+    }
+
+    .btn-restore {
+      background: #27ae60;
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #3d2545;
+      color: #9BA1A6;
+      margin-top: 10px;
+    }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .alert-error { background: rgba(192,57,43,0.18); border: 1px solid #c0392b; color: #ff7f74; }
+    .alert-success { background: rgba(39,174,96,0.15); border: 1px solid #27ae60; color: #6fcf97; }
+    .alert-warning { background: rgba(222,197,131,0.12); border: 1px solid #dec583; color: #dec583; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .badge-active { background: rgba(39,174,96,0.2); color: #6fcf97; border: 1px solid #27ae60; }
+    .badge-pending { background: rgba(192,57,43,0.2); color: #ff7f74; border: 1px solid #c0392b; }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #9BA1A6;
+      padding: 8px 0;
+      border-bottom: 1px solid #2a1a30;
+    }
+
+    .info-row span:last-child { color: #F5E6D3; }
+    .info-block { margin-bottom: 24px; }
+
+    .divider { height: 1px; background: #2a1a30; margin: 20px 0; }
+
+    .warn-box {
+      background: rgba(192,57,43,0.1);
+      border: 1px solid rgba(192,57,43,0.4);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #ffb3ad;
+      line-height: 1.6;
+    }
+
+    .warn-box strong { color: #ff7f74; }
+
+    .restore-box {
+      background: rgba(39,174,96,0.08);
+      border: 1px solid rgba(39,174,96,0.3);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #abebc6;
+      line-height: 1.6;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #section-login, #section-account { display: none; }
+
+    .confirm-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #9BA1A6;
+      cursor: pointer;
+    }
+
+    .confirm-check input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      margin: 2px 0 0 0;
+      accent-color: #c0392b;
+      cursor: pointer;
+    }
+
+    a.signout-link {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: #665070;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    a.signout-link:hover { color: #9BA1A6; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="logo">
+    <h1>BFinder</h1>
+    <p>Account Management</p>
+  </div>
+
+  <!-- ALERT (shared) -->
+  <div id="alert" class="alert" style="display:none;"></div>
+
+  <!-- ── SECTION: LOGIN ── -->
+  <section id="section-login">
+    <h2>Sign in to your account</h2>
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
+
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+    <button class="btn-primary" id="btn-login" onclick="handleLogin()">Sign In</button>
+  </section>
+
+  <!-- ── SECTION: ACCOUNT ── -->
+  <section id="section-account">
+    <h2>Account Deletion</h2>
+
+    <div class="info-block">
+      <div class="info-row">
+        <span>Name</span>
+        <span id="info-name">—</span>
+      </div>
+      <div class="info-row">
+        <span>Email</span>
+        <span id="info-email">—</span>
+      </div>
+      <div class="info-row" style="border-bottom:none;">
+        <span>Status</span>
+        <span id="info-status-badge"></span>
+      </div>
+    </div>
+
+    <!-- If pending deletion -->
+    <div id="block-pending" style="display:none;">
+      <div class="restore-box">
+        Your account is scheduled for permanent deletion on
+        <strong id="deletion-date">—</strong>.<br/><br/>
+        If you change your mind, you can cancel the deletion below and your account will be restored immediately.
+      </div>
+      <button class="btn-restore" id="btn-restore" onclick="handleRestore()">Cancel Deletion &amp; Restore Account</button>
+      <div class="divider"></div>
+    </div>
+
+    <!-- If active -->
+    <div id="block-active" style="display:none;">
+      <div class="warn-box">
+        <strong>⚠ Please read before continuing</strong><br/><br/>
+        Requesting deletion will:
+        <ul style="margin: 8px 0 0 16px; line-height: 1.8;">
+          <li>Immediately hide your profile from the app</li>
+          <li>Deactivate your expert listing (if applicable)</li>
+          <li>Permanently delete all your data after <strong>14 days</strong></li>
+        </ul>
+        <br/>
+        You can cancel within those 14 days by returning to this page and signing in.
+      </div>
+
+      <label class="confirm-check" id="confirm-label">
+        <input type="checkbox" id="confirm-check" onchange="toggleDeleteBtn()" />
+        I understand my account and all data will be permanently deleted after 14 days.
+      </label>
+
+      <button class="btn-danger" id="btn-delete" onclick="handleDelete()" disabled>
+        Request Account Deletion
+      </button>
+    </div>
+
+    <a class="signout-link" onclick="handleSignOut()">Sign out</a>
+  </section>
+
+</div>
+
+<script>
+  // ─────────────────────────────────────────────
+  // CONFIG – replace with your actual values
+  // ─────────────────────────────────────────────
+  const SUPABASE_URL  = "https://fbsvwvnaupfzyrpwvnrh.supabase.co";
+  const SUPABASE_ANON = "sb_publishable_HVfiFFXchaVmkzvO02Jbng_xFIRoXdh";
+  // ─────────────────────────────────────────────
+
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  // ── UI helpers ──────────────────────────────
+
+  function showAlert(msg, type = "error") {
+    const el = document.getElementById("alert");
+    el.className = "alert alert-" + type;
+    el.textContent = msg;
+    el.style.display = "block";
+  }
+
+  function hideAlert() {
+    document.getElementById("alert").style.display = "none";
+  }
+
+  function setLoading(btnId, loading, label) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.innerHTML = loading
+      ? `<span class="spinner"></span> Please wait…`
+      : label;
+  }
+
+  function showSection(name) {
+    ["login", "account"].forEach(s => {
+      document.getElementById("section-" + s).style.display =
+        s === name ? "block" : "none";
+    });
+  }
+
+  function toggleDeleteBtn() {
+    const checked = document.getElementById("confirm-check").checked;
+    document.getElementById("btn-delete").disabled = !checked;
+  }
+
+  // ── Render account state ─────────────────────
+
+  function renderAccount(profile) {
+    const isPending = profile.accountStatus === "pending_deletion";
+
+    document.getElementById("info-name").textContent =
+      (profile.firstName || "") + " " + (profile.lastName || "");
+    document.getElementById("info-email").textContent = profile.email || "—";
+
+    const badge = document.getElementById("info-status-badge");
+    if (isPending) {
+      badge.innerHTML = '<span class="status-badge badge-pending">Pending Deletion</span>';
+    } else {
+      badge.innerHTML = '<span class="status-badge badge-active">Active</span>';
+    }
+
+    document.getElementById("block-pending").style.display = isPending ? "block" : "none";
+    document.getElementById("block-active").style.display  = isPending ? "none"  : "block";
+
+    if (isPending && profile.deletionScheduledFor) {
+      const d = new Date(profile.deletionScheduledFor);
+      document.getElementById("deletion-date").textContent = d.toLocaleDateString("en-US", {
+        year: "numeric", month: "long", day: "numeric"
+      });
+    }
+
+    showSection("account");
+  }
+
+  // ── Auth: login ──────────────────────────────
+
+  async function handleLogin() {
+    hideAlert();
+    const email    = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+      showAlert("Please enter your email and password.");
+      return;
+    }
+
+    setLoading("btn-login", true, "Sign In");
+
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      showAlert(error.message || "Sign-in failed. Please check your credentials.");
+      setLoading("btn-login", false, "Sign In");
+      return;
+    }
+
+    await loadProfile(data.user.id);
+    setLoading("btn-login", false, "Sign In");
+  }
+
+  // ── Load profile ─────────────────────────────
+
+  async function loadProfile(userId) {
+    const { data, error } = await db
+      .from("profiles")
+      .select("firstName, lastName, email, accountStatus, deletionScheduledFor")
+      .eq("id", userId)
+      .single();
+
+    if (error || !data) {
+      showAlert("Could not load your profile. Please try again.");
+      return;
+    }
+
+    renderAccount(data);
+  }
+
+  // ── Delete account ───────────────────────────
+
+  async function handleDelete() {
+    hideAlert();
+    setLoading("btn-delete", true, "Request Account Deletion");
+
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { showAlert("Session expired. Please sign in again."); return; }
+
+    const graceDays = 14;
+    const scheduledFor = new Date(Date.now() + graceDays * 86400 * 1000).toISOString();
+
+    const { error: updateErr } = await db
+      .from("profiles")
+      .update({
+        accountStatus: "pending_deletion",
+        deletionRequestedAt: new Date().toISOString(),
+        deletionScheduledFor: scheduledFor,
+        pushToken: null
+      })
+      .eq("id", user.id);
+
+    if (updateErr) {
+      showAlert("Failed to submit deletion request: " + updateErr.message);
+      setLoading("btn-delete", false, "Request Account Deletion");
+      return;
+    }
+
+    // Deactivate expert listing if exists
+    await db.from("expert_details").update({ isActive: false }).eq("profileId", user.id);
+
+    await db.auth.signOut();
+
+    showSection("login");
+    showAlert(
+      `Your deletion request has been submitted. Your data will be permanently deleted in ${graceDays} days. You may cancel by signing in again before that date.`,
+      "success"
+    );
+  }
+
+  // ── Restore account ──────────────────────────
+
+  async function handleRestore() {
+    hideAlert();
+    setLoading("btn-restore", true, "Cancel Deletion & Restore Account");
+
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { showAlert("Session expired. Please sign in again."); return; }
+
+    const { error: profileErr } = await db
+      .from("profiles")
+      .update({ accountStatus: "active", deletionRequestedAt: null, deletionScheduledFor: null })
+      .eq("id", user.id)
+      .eq("accountStatus", "pending_deletion");
+
+    if (profileErr) {
+      showAlert("Failed to restore account: " + profileErr.message);
+      setLoading("btn-restore", false, "Cancel Deletion & Restore Account");
+      return;
+    }
+
+    // Re-activate expert listing if exists
+    await db.from("expert_details").update({ isActive: true }).eq("profileId", user.id);
+
+    await loadProfile(user.id);
+    setLoading("btn-restore", false, "Cancel Deletion & Restore Account");
+    showAlert("Your account has been restored successfully.", "success");
+  }
+
+  // ── Sign out ─────────────────────────────────
+
+  async function handleSignOut() {
+    await db.auth.signOut();
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("confirm-check").checked = false;
+    toggleDeleteBtn();
+    hideAlert();
+    showSection("login");
+  }
+
+  // ── Init ─────────────────────────────────────
+
+  (async () => {
+    const { data: { session } } = await db.auth.getSession();
+    if (session?.user) {
+      await loadProfile(session.user.id);
+    } else {
+      showSection("login");
+    }
+  })();
+
+  // Allow Enter key on login form
+  document.addEventListener("keydown", e => {
+    if (e.key === "Enter" && document.getElementById("section-login").style.display !== "none") {
+      handleLogin();
+    }
+  });
+</script>
+
+</body>
+</html>
